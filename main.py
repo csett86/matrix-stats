@@ -13,6 +13,10 @@ import socket
 import pickle
 import struct
 
+import urllib.request
+import gzip
+import json
+
 import psycopg2
 
 async def fetch(session, url, headers=None):
@@ -95,6 +99,11 @@ def postgres_destinations():
         destinations.append(destination)
     return destinations
 
+def serverstats_destinations():
+    with urllib.request.urlopen('https://serverstats.nordgedanken.dev/servers?include_members=true') as f:
+        servers = json.loads(gzip.decompress(f.read()))['servers']
+        return servers
+
 def format_report(versions):
     report = ""
     total = 0
@@ -133,6 +142,8 @@ async def main(args):
         destination_func = postgres_destinations
     elif args.enable_file_destinations:
         destination_func = file_destinations
+    elif args.enable_serverstats:
+        destination_func = serverstats_destinations
     else:
         destination_func = test_destinations
 
@@ -166,6 +177,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--enable-postgres", help="use postgres destinations, if not specified, uses internal test destinations", action="store_true")
     parser.add_argument("--enable-file-destinations", help="destinations from file test_destinations.txt in current folder, do not use with --enable-postgres", action="store_true")
+    parser.add_argument("--enable-serverstats", help="fetch servers from serverstats.nordgedanken.dev/servers, do not use with --enable-postgres or --enable-file-destinations", action="store_true")
     parser.add_argument("--enable-report", help="write out a report to file", action="store_true")
     parser.add_argument("--enable-graphite", help="send result to graphite on localhost:2004 via pickle", action="store_true")
     parser.add_argument("--debug", help="print out report for debugging to stdout", action="store_true")
