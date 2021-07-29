@@ -100,9 +100,16 @@ def postgres_destinations():
     return destinations
 
 def serverstats_destinations():
-    with urllib.request.urlopen('https://serverstats.nordgedanken.dev/servers?include_members=true') as f:
-        servers = json.loads(gzip.decompress(f.read()))['servers']
-        return servers
+    try:
+        with urllib.request.urlopen('https://serverstats.nordgedanken.dev/servers?include_members=true') as f:
+            servers = json.loads(gzip.decompress(f.read()))['servers']
+            with open('servers_fallback.json', 'w') as fallback:
+                fallback.write(json.dumps(servers))
+
+            return servers
+    except:
+        with open('servers_fallback.json') as fallback:
+            return json.loads(fallback.read())
 
 def format_report(versions):
     report = ""
