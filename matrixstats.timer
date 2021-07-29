@@ -1,0 +1,10 @@
+[Unit]
+Description=Run matrix-stats
+
+[Timer]
+OnCalendar=*:0
+RandomizedDelaySec=60
+Persistent=true
+
+[Install]
+WantedBy=timers.target

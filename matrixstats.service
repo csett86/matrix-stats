@@ -1,0 +1,8 @@
+[Unit]
+Description=matrix-stats
+
+[Service]
+User=mxversions
+WorkingDirectory=/home/mxversions/matrix-stats
+ExecStart=/home/mxversions/matrix-stats/env/bin/python3 /home/mxversions/matrix-stats/main.py --enable-serverstats --enable-report --enable-graphite
+LimitNOFILE=1048576
